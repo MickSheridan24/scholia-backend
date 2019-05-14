@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_13_211943) do
+ActiveRecord::Schema.define(version: 2019_05_14_150316) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,12 +27,13 @@ ActiveRecord::Schema.define(version: 2019_05_13_211943) do
     t.integer "user_id"
     t.integer "study_id"
     t.string "title"
-    t.integer "bodylocation_p_index"
     t.integer "location_char_index"
     t.string "color"
     t.boolean "public"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "location_p_index"
+    t.string "body"
   end
 
   create_table "books", force: :cascade do |t|
@@ -41,6 +42,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_211943) do
     t.integer "gutenberg_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "temporary_text"
   end
 
   create_table "categories", force: :cascade do |t|
