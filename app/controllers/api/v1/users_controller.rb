@@ -16,6 +16,6 @@ class Api::V1::UsersController < ApplicationController
 
   def user_params
     #AUTH IT UP
-    params.require("user").require("username", "password_digest")
+    params.require("user").require("username", "password")
   end
 end

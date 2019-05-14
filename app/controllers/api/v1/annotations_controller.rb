@@ -1,4 +1,6 @@
 class Api::V1::AnnotationsController < ApplicationController
+  before_action :authenticated, only: [:destroy]
+
   def index
     #Should respond to some filtering query (by user_id, by group_id, by category)
     render json: Annotation.all, except: [:created_at, :updated_at], include: :categories
