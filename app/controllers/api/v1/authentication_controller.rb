@@ -1,9 +1,9 @@
 class Api::V1::AuthenticationController < ApplicationController
-  def create
-    user = User.find_by(username: params[:username])
-    if user && user.authenticate(params[:password])
+  def authorize
+    user = User.find_by(username: auth_params["username"])
+    if user && user.authenticate(auth_params["password"])
       render json: {
-               id: user.id,
+               success: true,
                username: user.username,
                jwt: encode_token({user_id: user.id}),
              }
@@ -11,4 +11,11 @@ class Api::V1::AuthenticationController < ApplicationController
       render json: {error: "Username/Password incorrect"}, status: 404
     end
   end
+
+  private
+
+  def auth_params
+    params.require("authentication").permit("username", "password")
+  end
+
 end

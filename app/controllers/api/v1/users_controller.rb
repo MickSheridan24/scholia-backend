@@ -1,11 +1,23 @@
 class Api::V1::UsersController < ApplicationController
-  #Dummy controller without auth
+  before_action :authenticated, only: [:show, :update]
+
   def create
-    @user = User.create(user_params)
+    @user = User.create(:username => user_params["username"], password: user_params["password"])
+    if (@user.save)
+      render json: {
+        success: true,
+        username: @user.username,
+        jwt: encode_token({user_id: @user.id}),
+      }
+    else
+      render json: {error: "Unable to create user"}, status: 404
+    end
   end
 
   def show
-    render json: User.find(params[:id])
+    @user = logged_in?
+
+    render json: @user
   end
 
   def update
@@ -16,6 +28,6 @@ class Api::V1::UsersController < ApplicationController
 
   def user_params
     #AUTH IT UP
-    params.require("user").require("username", "password")
+    params.require("user").permit("username", "password")
   end
 end

@@ -7,14 +7,16 @@ Rails.application.routes.draw do
       resources :annotations, except: [:new, :edit]
       # annotaitions#index for a particular user's annotations, or books annotations
 
-      resources :users, only: [:create, :show, :update]
+      get "/users/home", to: "users#show"
+      resources :users, only: [:create, :update]
+
       # show and update are perhaps unneccessary
 
       resources :categories, only: [:index, :show]
 
       resources :studies, only: [:index, :show, :create, :update, :destroy]
 
-      post "/login", to: "authentication#create"
+      post "/login", to: "authentication#authorize"
 
       #NO CONTROLLER
       #Likes

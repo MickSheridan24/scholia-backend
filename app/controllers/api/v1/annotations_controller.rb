@@ -2,8 +2,9 @@ class Api::V1::AnnotationsController < ApplicationController
   before_action :authenticated, only: [:destroy]
 
   def index
+    book_id = query_params["book_id"].to_i
     #Should respond to some filtering query (by user_id, by group_id, by category)
-    render json: Annotation.all, except: [:created_at, :updated_at], include: :categories
+    render json: Annotation.allByBook(book_id)
   end
 
   def show
@@ -32,5 +33,9 @@ class Api::V1::AnnotationsController < ApplicationController
 
   def annotation_params
     params.require("annotation").permit("book_id", "user_id", "study_id", "title", "color", "body", "location_p_index", "location_char_index", "color", "public")
+  end
+
+  def query_params
+    params.permit("book_id")
   end
 end

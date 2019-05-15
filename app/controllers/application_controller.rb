@@ -1,5 +1,3 @@
-require_rel "../../secrets.rb"
-
 class ApplicationController < ActionController::API
   def encode_token(payload)
     # payload => {beef: "steak"}
@@ -32,7 +30,6 @@ class ApplicationController < ActionController::API
   def authenticated
     if !logged_in?
       render json: {success: false, message: "User not logged in"}, status: 401
-      return false
     else
       return true
     end
