@@ -8,7 +8,7 @@ class Annotation < ApplicationRecord
 
   def self.allByBook(id)
     if (id.is_a? Integer)
-      sql = "SELECT * FROM annotations WHERE book_id = #{id}"
+      sql = "SELECT * FROM annotations WHERE book_id = #{id} ORDER BY location_char_index DESC"
       ret = ActiveRecord::Base.connection.execute(sql).to_a
     end
   end
