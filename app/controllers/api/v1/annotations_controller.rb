@@ -25,6 +25,7 @@ class Api::V1::AnnotationsController < ApplicationController
 
   def create
     #VALIDATIONS
+
     @annotation = Annotation.create(annotation_params)
     render json: @annotation
   end
@@ -32,7 +33,7 @@ class Api::V1::AnnotationsController < ApplicationController
   private
 
   def annotation_params
-    params.require("annotation").permit("book_id", "user_id", "study_id", "title", "color", "body", "location_p_index", "location_char_index", "color", "public")
+    params.require("annotation").permit("book_id", "user_id", "study_id", "title", "color", "body", "location_p_index", "location_char_index", "public")
   end
 
   def query_params
