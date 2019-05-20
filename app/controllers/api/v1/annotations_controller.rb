@@ -25,15 +25,23 @@ class Api::V1::AnnotationsController < ApplicationController
 
   def create
     #VALIDATIONS
+    user = logged_in?
+    if user
+      full_params = annotation_params
+      full_params[:user_id] = user.id
 
-    @annotation = Annotation.create(annotation_params)
-    render json: @annotation
+      @annotation = Annotation.create(full_params)
+
+      render json: {success: true, annotation: @annotation}
+    else
+      render json: {success: false}
+    end
   end
 
   private
 
   def annotation_params
-    params.require("annotation").permit("book_id", "user_id", "study_id", "title", "color", "body", "location_p_index", "location_char_index", "public")
+    params.require("annotation").permit("book_id", "study_id", "title", "color", "body", "location_p_index", "location_char_index", "public")
   end
 
   def query_params
