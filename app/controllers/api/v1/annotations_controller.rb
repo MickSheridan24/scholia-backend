@@ -17,9 +17,15 @@ class Api::V1::AnnotationsController < ApplicationController
   end
 
   def destroy
+    user = logged_in?
+
     @annotation = Annotation.find(params[:id])
-    @annotation.destroy
-    render json: {success: true, annotation: @annotation}
+    if user.id == @annotation.user_id
+      @annotation.destroy
+      render json: {success: true, annotation: @annotation}
+    else
+      render json: {success: false}
+    end
   end
 
   def create
