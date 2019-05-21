@@ -1,5 +1,5 @@
 class Api::V1::AnnotationsController < ApplicationController
-  before_action :authenticated, only: [:destroy]
+  before_action :authenticated
 
   def index
     book_id = query_params["book_id"].to_i
@@ -13,14 +13,13 @@ class Api::V1::AnnotationsController < ApplicationController
   end
 
   def update
-    #AUTH -- update text
-    #NO AUTH -- add like
     render json: {response: "ANNOTATIONS CONTROLLER UPDATE RESPONSE"}
   end
 
   def destroy
-    #AUTH
-    render json: {response: "ANNOTATIONS CONTROLLER DELETE RESPONSE"}
+    @annotation = Annotation.find(params[:id])
+    @annotation.destroy
+    render json: {success: true, annotation: @annotation}
   end
 
   def create

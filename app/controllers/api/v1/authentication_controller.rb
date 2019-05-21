@@ -5,6 +5,7 @@ class Api::V1::AuthenticationController < ApplicationController
       render json: {
                success: true,
                username: user.username,
+               id: user.id,
                jwt: encode_token({user_id: user.id}),
              }
     else
@@ -17,5 +18,4 @@ class Api::V1::AuthenticationController < ApplicationController
   def auth_params
     params.require("authentication").permit("username", "password")
   end
-
 end
