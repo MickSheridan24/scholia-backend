@@ -17,11 +17,14 @@ class Annotation < ApplicationRecord
 
   def self.serialize(user, annotation, options)
     anno = Annotation.find(annotation["id"])
-    likeCount = anno.likes
-    userLiked = anno.likes.find { |l| l.user_id == user.id }
+    likeCount = anno.likes.length
+
+    userLiked = !!anno.likes.find { |l| l.user_id == user.id }
+
     obj = annotation.dup
     obj[:likeCount] = likeCount
     obj[:userLiked] = userLiked
+
     obj
   end
 end

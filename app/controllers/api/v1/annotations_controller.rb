@@ -22,7 +22,7 @@ class Api::V1::AnnotationsController < ApplicationController
     annotation = Annotation.find(like_params["id"])
 
     if annotation.user_id != user.id
-      if (Like.all.find { |l| l.user_id == user.id })
+      if (Like.all.find { |l| l.user_id == user.id && l.annotation_id == annotation.id })
         render json: {success: false, message: "User cannot like a post twice"}
       else
         annotation.likes << Like.new(annotation_id: like_params["id"], user_id: user.id)
