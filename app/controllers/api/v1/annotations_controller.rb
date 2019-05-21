@@ -4,12 +4,13 @@ class Api::V1::AnnotationsController < ApplicationController
   def index
     book_id = query_params["book_id"].to_i
     #Should respond to some filtering query (by user_id, by group_id, by category)
-    render json: Annotation.allByBook(book_id)
+    user = logged_in?
+    render json: Annotation.allByBook(user, book_id)
   end
 
   def show
     #Serialize likes
-    render json: Annotation.find(params[:id]), except: [:created_at, :updated_at], include: :categories
+    render json: Annotation.find(params[:id]).serialize
   end
 
   def update
