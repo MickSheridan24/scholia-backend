@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       resources :books, only: [:show, :index, :create]
       # books#show will serialize annotations(filtered by subscription)
 
+      post "/annotations/likes", to: "annotations#like"
       resources :annotations, except: [:new, :edit]
       # annotaitions#index for a particular user's annotations, or books annotations
 

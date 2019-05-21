@@ -16,6 +16,22 @@ class Api::V1::AnnotationsController < ApplicationController
     render json: {response: "ANNOTATIONS CONTROLLER UPDATE RESPONSE"}
   end
 
+  def like
+    user = logged_in?
+    annotation = Annotation.find(like_params["id"])
+
+    if annotation.user_id != user.id
+      if (Like.all.find { |l| l.user_id == user.id })
+        render json: {success: false, message: "User cannot like a post twice"}
+      else
+        annotation.likes << Like.new(annotation_id: like_params["id"], user_id: user.id)
+        render json: {success: true, like: annotation.likes.last}
+      end
+    else
+      render json: {success: false, message: "User cannot like their own post"}
+    end
+  end
+
   def destroy
     user = logged_in?
 
@@ -24,7 +40,7 @@ class Api::V1::AnnotationsController < ApplicationController
       @annotation.destroy
       render json: {success: true, annotation: @annotation}
     else
-      render json: {success: false}
+      render json: {success: false, message: "User cannot delete other users' posts"}
     end
   end
 
@@ -51,5 +67,9 @@ class Api::V1::AnnotationsController < ApplicationController
 
   def query_params
     params.permit("book_id")
+  end
+
+  def like_params
+    params.require("annotation").permit("id")
   end
 end
