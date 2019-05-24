@@ -12,6 +12,10 @@ def fetch_book(search)
 
   secondReq = ""
   path = result["formats"][key]
+
+  if (path.ends_with?(".zip"))
+    path = path.gsub(".zip", ".txt")
+  end
   # if (path.ends_with?(".htm") || path.ends_with?(".html") || path.ends_with?(".images"))
   #   secondReq = RestClient.get(path)
   # else

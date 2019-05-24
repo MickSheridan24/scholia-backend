@@ -3,48 +3,42 @@ class Book < ApplicationRecord
 
   #All steps in preparing book text before serving to the front end
 
-  def self.fetch_book(search)
-    req = Nokogiri::HTML(open("http://gutendex.com/books?search=#{search}"))
-    search = JSON(req)
-    result = search["results"][0]
+  def self.fetch_book(id)
+    req = RestClient.get("http://gutendex.com/books/#{id}")
+    result = JSON(req)
+
     if (result)
       key = result["formats"].keys.find do |k|
-        k.starts_with?("text/html")
+        k.starts_with?("text/plain")
       end
-      if (key)
-        textReq = ""
-        path = result["formats"][key]
-        if (path.ends_with?(".htm") || path.ends_with?(".html") || path.ends_with?(".images"))
-          textReq = Nokogiri::HTML(open(path))
-        else
-          altered_path = path
-          altered_path = altered_path.split(".")[0...-1].join(".")
-          altered_path += "/#{result["id"]}-h.htm"
-          textReq = Nokogiri::HTML(open(altered_path))
-        end
+    end
 
-        return textReq
-      end
+    secondReq = ""
+    path = result["formats"][key]
+    if (path.ends_with?(".zip"))
+      path = path.gsub(".zip", ".txt")
+    end
+
+    secondReq = RestClient.get(path)
+    text = JSON({body: secondReq})
+
+    {title: result["title"], author: result["authors"][0]["name"], text: text}
+  end
+
+  def self.checkout(id)
+    book = Book.find_by(gutenberg_id: id)
+    if (book)
+      return book
     else
-      return false
+      book = Book.fetch_book(id)
+      checked_out = Book.create(title: book[:title], author: book[:author], gutenberg_id: id, temporary_text: book[:text])
+
+      return checked_out
     end
   end
 
-  #remove any scripts
-  #attach body to div
-  def self.sanitize(nokoText)
-    doc = nokoText.at_css("body")
-    doc.node_name = "div"
-    doc.set_attribute("id", "text-body")
-    doc.search("style, script, meta").remove
-
-    doc.to_html
-  end
-
-  def prepare(search)
-    text = Book.fetch_book(self.title)
-    text = Book.sanitize(text)
-    self.temporary_text = text
-    self.save
+  def self.search_api(query)
+    req = RestClient.get("http://gutendex.com/books?search=#{query}")
+    search = JSON(req)
   end
 end

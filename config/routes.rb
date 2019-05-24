@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      get "/books/search", to: "books#search"
       resources :books, only: [:show, :index, :create]
       # books#show will serialize annotations(filtered by subscription)
 
