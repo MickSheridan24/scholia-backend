@@ -1,7 +1,9 @@
 class Api::V1::StudiesController < ApplicationController
+  before_action :authenticated
+
   def index
     #filter by user_id, categories, book
-    render json: Study.all, except: [:created_at, :updated_at]
+    render json: Study.serialize_all
   end
 
   def show
@@ -13,6 +15,20 @@ class Api::V1::StudiesController < ApplicationController
     #update description
     #add subscribers/contributors
     render json: {response: "STUDIES CONTROLLER UPDATE"}
+  end
+
+  def subscribe
+    user = logged_in?
+    study = Study.find(params[:study_id].to_i)
+    subscription = Subscriber.create(user_id: user.id, study_id: study.id)
+
+    render json: subscription
+  end
+
+  def unsubscribe
+    subscription = Subscriber.where(user_id: user.id, study_id: study.id)
+    subscription.destroy
+    render json: subscription
   end
 
   def create
