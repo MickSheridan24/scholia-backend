@@ -24,6 +24,14 @@ class Annotation < ApplicationRecord
     obj = annotation.dup
     obj[:likeCount] = likeCount
     obj[:userLiked] = userLiked
+    if (obj[:study_id] != nil)
+      study = Study.find(obj[:study_id])
+      obj[:study] = {}
+      obj[:study][:name] = study[:name]
+      obj[:study][:description] = study[:description]
+      obj[:study][:color] = study[:color]
+      obj[:study][:id] = study[:id]
+    end
 
     obj
   end
