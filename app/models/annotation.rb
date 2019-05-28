@@ -8,24 +8,23 @@ class Annotation < ApplicationRecord
 
   def self.allByBook(user, id)
     if (id.is_a? Integer)
-      sql = "SELECT * FROM annotations WHERE book_id = #{id} ORDER BY location_char_index DESC"
-      ret = ActiveRecord::Base.connection.execute(sql).to_a
+      annotations = Annotation.where(book_id: id).order(location_char_index: :desc)
 
-      ret.to_a.map { |a| Annotation.serialize(user, a, {}) }
+      annotations.to_a.map { |a| Annotation.serialize(user, a, {}) }
     end
   end
 
   def self.serialize(user, annotation, options)
-    anno = Annotation.find(annotation["id"])
-    likeCount = anno.likes.length
+    likeCount = annotation.likes.length
 
-    userLiked = !!anno.likes.find { |l| l.user_id == user.id }
+    userLiked = !!annotation.likes.find { |l| l.user_id == user.id }
 
-    obj = annotation.dup
+    obj = annotation.attributes
     obj[:likeCount] = likeCount
     obj[:userLiked] = userLiked
-    if (obj[:study_id] != nil)
-      study = Study.find(obj[:study_id])
+
+    if (obj["study_id"] != nil)
+      study = Study.find(obj["study_id"])
       obj[:study] = {}
       obj[:study][:name] = study[:name]
       obj[:study][:description] = study[:description]

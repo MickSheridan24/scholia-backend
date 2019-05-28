@@ -54,7 +54,7 @@ class Api::V1::AnnotationsController < ApplicationController
 
       @annotation = Annotation.create(full_params)
 
-      render json: {success: true, annotation: @annotation}
+      render json: {success: true, annotation: Annotation.serialize(user, @annotation, {})}
     else
       render json: {success: false}
     end
