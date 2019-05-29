@@ -1,9 +1,9 @@
 class Api::V1::StudiesController < ApplicationController
-  before_action :authenticated
+  # before_action :authenticated
 
   def index
     #filter by user_id, categories, book
-    render json: Study.serialize_all
+    render json: Study.serialize_all(logged_in?)
   end
 
   def show
@@ -21,14 +21,23 @@ class Api::V1::StudiesController < ApplicationController
     user = logged_in?
     study = Study.find(params[:study_id].to_i)
     subscription = Subscriber.create(user_id: user.id, study_id: study.id)
-
-    render json: subscription
+    if (subscription)
+      render json: {success: true, subscription: subscription}
+    else
+      render json: {success: false}
+    end
   end
 
   def unsubscribe
-    subscription = Subscriber.where(user_id: user.id, study_id: study.id)
-    subscription.destroy
-    render json: subscription
+    user = logged_in?
+    study = Study.find(params["id"].to_i)
+    subscriptions = Subscriber.where(user_id: user.id, study_id: study.id)
+
+    if (subscriptions.destroy_all)
+      render json: {success: true, subscription: subscriptions.first}
+    else
+      render json: {success: false}
+    end
   end
 
   def create

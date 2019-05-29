@@ -17,7 +17,7 @@ Rails.application.routes.draw do
       resources :categories, only: [:index, :show]
 
       post "/subscriptions", to: "studies#subscribe"
-      delete "/subscriptions/:id", to: "studies#destroy"
+      delete "/subscriptions/:id", to: "studies#unsubscribe"
       resources :studies, only: [:index, :show, :create, :update, :destroy]
 
       post "/login", to: "authentication#authorize"
