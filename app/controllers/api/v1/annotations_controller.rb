@@ -2,10 +2,14 @@ class Api::V1::AnnotationsController < ApplicationController
   before_action :authenticated
 
   def index
-    book_id = query_params["book_id"].to_i
-    #Should respond to some filtering query (by user_id, by group_id, by category)
     user = logged_in?
-    render json: Annotation.allByBook(user, book_id)
+    if query_params["book_id"]
+      book_id = query_params["book_id"].to_i
+
+      render json: Annotation.allByBook(user, book_id)
+    else
+      render json: Annotation.allByUser(user)
+    end
   end
 
   def show

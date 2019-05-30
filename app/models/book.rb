@@ -22,7 +22,8 @@ class Book < ApplicationRecord
     secondReq = RestClient.get(path)
     text = JSON({body: secondReq})
 
-    {title: result["title"], author: result["authors"][0]["name"], text: text}
+    author = (result["authors"] && result["authors"][0] && result["authors"][0]["name"]) || "No Author"
+    {title: result["title"], author: author, text: text}
   end
 
   def self.checkout(id)

@@ -10,8 +10,19 @@ class Annotation < ApplicationRecord
     if (id.is_a? Integer)
       annotations = Annotation.where(book_id: id).order(location_char_index: :desc)
 
-      annotations.to_a.map { |a| Annotation.serialize(user, a, {}) }
+      annotations.to_a.map { |a| Annotation.serialize(user, a, {by: :book}) }
     end
+  end
+
+  def self.allByUser(user)
+    annotations = Annotation.where(user_id: user.id).sort do |l, h|
+      h.likeCount <=> l.likeCount
+    end
+    annotations.to_a.map { |a| Annotation.serialize(user, a, {by: :user}) }
+  end
+
+  def likeCount
+    return self.likes.length
   end
 
   def self.serialize(user, annotation, options)
@@ -21,7 +32,12 @@ class Annotation < ApplicationRecord
 
     obj = annotation.attributes
     obj[:likeCount] = likeCount
-    obj[:userLiked] = userLiked
+
+    if (options[:by] == :book)
+      obj[:userLiked] = userLiked
+    elsif (options[:by] == :user)
+      obj[:book] = {title: annotation.book.title, author: annotation.book.author, id: annotation.book.id, gutenberg_id: annotation.book.gutenberg_id}
+    end
 
     if (obj["study_id"] != nil)
       study = Study.find(obj["study_id"])

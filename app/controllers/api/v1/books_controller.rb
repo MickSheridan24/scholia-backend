@@ -10,7 +10,7 @@ class Api::V1::BooksController < ApplicationController
 
     if @results["count"] && @results["count"] > 0
       package = @results["results"].map do |book|
-        {id: book["id"], title: book["title"], author: book["authors"].first["name"]}
+        {id: book["id"], title: book["title"], author: (book["authors"] && book["authors"].first && book["authors"].first["name"]) || "Author Not Found"}
       end
       render json: {success: true, results: package}
     else

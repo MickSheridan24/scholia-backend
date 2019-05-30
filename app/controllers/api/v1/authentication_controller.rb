@@ -9,7 +9,7 @@ class Api::V1::AuthenticationController < ApplicationController
                jwt: encode_token({user_id: user.id}),
              }
     else
-      render json: {error: "Username/Password incorrect"}, status: 404
+      render json: {success: false, error: "Username/Password incorrect"}
     end
   end
 
