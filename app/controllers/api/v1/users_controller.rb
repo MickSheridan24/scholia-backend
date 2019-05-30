@@ -3,7 +3,9 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     @user = User.create(:username => user_params["username"], password: user_params["password"])
+
     if (@user.save)
+      @user.default_subscriptions
       render json: {
         success: true,
         username: @user.username,
