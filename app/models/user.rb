@@ -12,7 +12,6 @@ class User < ApplicationRecord
   end
 
   def default_subscriptions
-    byebug
     subscriptions = [Study.find_by(name: "Definitions"), Study.find_by(name: "Thematic Aspects"), Study.find_by(name: "Literary Analysis"), Study.find_by(name: "About The Author"), Study.find_by(name: "Historical Context")]
     subscriptions.each do |s|
       Subscriber.create(user_id: self.id, study_id: s.id)
