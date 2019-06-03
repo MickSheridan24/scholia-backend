@@ -3,6 +3,8 @@ class Book < ApplicationRecord
 
   #All steps in preparing book text before serving to the front end
 
+  # Book.fetch_book
+  # Fetches book from Gutenberg site
   def self.fetch_book(id)
     req = RestClient.get("http://gutendex.com/books/#{id}")
     result = JSON(req)
@@ -26,6 +28,8 @@ class Book < ApplicationRecord
     {title: result["title"], author: author, text: text}
   end
 
+  # Book.checkout
+  # Checks if book is in the database before fetching from database
   def self.checkout(id)
     book = Book.find_by(gutenberg_id: id)
     if (book)
@@ -38,6 +42,8 @@ class Book < ApplicationRecord
     end
   end
 
+  # Book.search_api
+  # Returns titles, authors, and ids based on a loose user search
   def self.search_api(query)
     req = RestClient.get("http://gutendex.com/books?search=#{query}")
     search = JSON(req)
