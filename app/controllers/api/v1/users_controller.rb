@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authenticated, only: [:show, :update]
 
+  #POST users/
   def create
     @user = User.create(:username => user_params["username"], password: user_params["password"])
 
@@ -16,12 +17,15 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  #GET users/home
   def show
     @user = logged_in?
 
     render json: @user
   end
 
+  #PATCH users/:id
+  #TODO
   def update
     render json: {response: "USERS CONTROLLER UPDATE"}
   end

@@ -1,6 +1,9 @@
 class Api::V1::AnnotationsController < ApplicationController
   before_action :authenticated
 
+  # GET /annotations?book_id=:gutenberg_id
+  # Serves all annotations with associated book_id
+  # If no book_id, serves all annotations by user_id
   def index
     user = logged_in?
     if query_params["book_id"]
@@ -12,15 +15,19 @@ class Api::V1::AnnotationsController < ApplicationController
     end
   end
 
+  #GET annotations/:id
   def show
-    #Serialize likes
     render json: Annotation.find(params[:id]).serialize
   end
 
+  #PATCH annotations/:id
+  #TODO -- Edit Feature
   def update
     render json: {response: "ANNOTATIONS CONTROLLER UPDATE RESPONSE"}
   end
 
+  #POST annotations/likes
+  #Creates new like
   def like
     user = logged_in?
     annotation = Annotation.find(like_params["id"])
@@ -37,9 +44,10 @@ class Api::V1::AnnotationsController < ApplicationController
     end
   end
 
+  #DELETE annotations/:id
+  #restricted to annotation's user
   def destroy
     user = logged_in?
-
     @annotation = Annotation.find(params[:id])
     if user.id == @annotation.user_id
       @annotation.destroy
@@ -49,15 +57,13 @@ class Api::V1::AnnotationsController < ApplicationController
     end
   end
 
+  #POST annotations/
   def create
-    #VALIDATIONS
     user = logged_in?
     if user
       full_params = annotation_params
       full_params[:user_id] = user.id
-
       @annotation = Annotation.create(full_params)
-
       render json: {success: true, annotation: Annotation.serialize(user, @annotation, {})}
     else
       render json: {success: false}

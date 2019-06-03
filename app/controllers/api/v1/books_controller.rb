@@ -1,10 +1,13 @@
 
 class Api::V1::BooksController < ApplicationController
+
+  #GET books/:gutenberg_id
   def show
     @book = Book.checkout(params[:id].to_i)
     render json: @book
   end
 
+  #GET books/search?query=()
   def search
     @results = Book.search_api(search_params)
 

@@ -21,11 +21,6 @@ Rails.application.routes.draw do
       resources :studies, only: [:index, :show, :create, :update, :destroy]
 
       post "/login", to: "authentication#authorize"
-
-      #NO CONTROLLER
-      #Likes
-      #Subscribers
-      #Contributors
     end
   end
 end
