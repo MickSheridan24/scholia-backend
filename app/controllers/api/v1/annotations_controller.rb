@@ -23,7 +23,15 @@ class Api::V1::AnnotationsController < ApplicationController
   #PATCH annotations/:id
   #TODO -- Edit Feature
   def update
-    render json: {response: "ANNOTATIONS CONTROLLER UPDATE RESPONSE"}
+    annotation = Annotation.find(update_params["id"])
+    user = logged_in?
+    if user.id === annotation.user_id
+      if annotation.update(body: update_params["body"], title: update_params["title"])
+        render json: {success: true, annotation: annotation}
+      else
+        render json: {success: false}
+      end
+    end
   end
 
   #POST annotations/likes
@@ -78,6 +86,10 @@ class Api::V1::AnnotationsController < ApplicationController
 
   def query_params
     params.permit("book_id")
+  end
+
+  def update_params
+    params.require("annotation").permit("title", "body", "id")
   end
 
   def like_params
