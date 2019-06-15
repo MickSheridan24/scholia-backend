@@ -1,24 +1,9 @@
-# README
+## Scholia-Backend
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+##### _Built with Ruby on Rails_
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+  For use of the _Scholia_ React App. 
+  
+  This App accesses _The Gutenberg Project_ with help of [Gutendex](http://gutendex.com/)
+  
+  Data stored in a Postgres database.  
