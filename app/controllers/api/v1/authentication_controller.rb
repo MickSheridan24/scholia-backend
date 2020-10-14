@@ -3,6 +3,7 @@ class Api::V1::AuthenticationController < ApplicationController
   #POST /login
   def authorize
     user = User.find_by(username: auth_params["username"])
+    byebug
     if user && user.authenticate(auth_params["password"])
       render json: {
                success: true,
