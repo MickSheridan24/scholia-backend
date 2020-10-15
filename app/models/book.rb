@@ -25,7 +25,7 @@ class Book < ApplicationRecord
   def self.checkout(id)
     book = Book.find_by(gutenberg_id: id)
     if (book)
-      return book
+      return {book: book, sections: book.sections}
     else
       book = Book.fetch_book(id)
       checked_out = Book.create(title: book[:title], author: book[:author], gutenberg_id: id)
@@ -38,7 +38,7 @@ class Book < ApplicationRecord
         checked_out.sections.push sect
       end
 
-      return checked_out
+      return {book: checked_out, sections: checked_out.sections}
     end
   end
 
