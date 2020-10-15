@@ -30,8 +30,11 @@ class Book < ApplicationRecord
       book = Book.fetch_book(id)
       checked_out = Book.create(title: book[:title], author: book[:author], gutenberg_id: id)
 
-      book[:sections].each do |s|
-        sect = Section.create(html: s[:html], plain: s[:plain], type: s[:type])
+      book[:sections].each do |sect|
+        sect = Section.create(html: sect[:html], 
+                              plain: sect[:plain], 
+                              section_type: sect[:section_type], 
+                              section_number: sect[:section_number])
         checked_out.sections.push sect
       end
 
@@ -45,71 +48,88 @@ class Book < ApplicationRecord
     req = RestClient.get("http://gutendex.com/books?search=#{query}")
     search = JSON req
   end
-end
 
+  def self.get_formats formats 
 
-def get_formats formats 
+    retF = {}
 
-  retF = {}
+    htmlF = find_html_format formats 
+    plainF = find_plain_format formats 
 
-  htmlF = find_html_format formats 
-  plainF = find_plain_format formats 
+    htmlF && retF["html"] = htmlF
+    plainF && retF["plain"] = plainF
 
-  htmlF && retF["html"] = htmlF
-  plainF && retF["plain"] = plainF
-
-  retF
-end
-
-def find_html_format formats 
-
-  key = formats.keys.find do |k|
-    k.starts_with?("text/html")
-  end
-  path = formats[key]
-  if (path.ends_with?(".zip"))
-    path = path.gsub(".zip", ".html")
+    retF
   end
 
-  path
-end
+  def self.find_html_format formats 
 
-def find_plain_format formats 
+    key = formats.keys.find do |k|
+      k.starts_with?("text/html")
+    end
+    path = formats[key]
+    if (path.ends_with?(".zip"))
+      path = path.gsub(".zip", ".html")
+    end
 
-  key = formats.keys.find do |k|
-    k.starts_with?("text/plain")
+    path
   end
-  path = formats[key]
-  if (path.ends_with?(".zip"))
-    path = path.gsub(".zip", ".txt")
+
+  def self.find_plain_format formats 
+
+    key = formats.keys.find do |k|
+      k.starts_with?("text/plain")
+    end
+    path = formats[key]
+    if (path.ends_with?(".zip"))
+      path = path.gsub(".zip", ".txt")
+    end
+
+    path
   end
 
-  path
-end
+
+  def self.handle_html_book path 
+    sections = path && parse_html_sections(RestClient.get(path))
+  end
+
+  def self.handle_plain_book path
+    plaintext = path && parse_plain_sections(RestClient.get(path))
+  end
+
+  def self.parse_plain_sections plaintext
+    plaintext.split("\r\r").flatten.split("\n\n").map{ |s| [plain: s, section_type: "plaintext"]}
+  end
+
+  def self.parse_html_sections html
+    parsed = Nokogiri::HTML html 
+    sections = []
+    sectionNodes = parsed.css("h1, h2, h3, h4, h5, p")
+
+    order = 0;
+    sectionNodes.each do |node| 
+      if !node.content.blank?
+        sections.push({:html => node.content.strip, section_type: get_section_type(node), section_number: order})
+        order += 1
+      end
+    end
+
+    sections
+  end
 
 
-def handle_html_book path 
-  sections = path && parse_html_sections(RestClient.get(path))
-end
+  def self.get_section_type node 
 
-def handle_plain_book path
-  plaintext = path && parse_plain_sections(RestClient.get(path))
-end
+    case node.name
+      when "h1"
+        return "title"
+      when "h2", "h3", "h4", "h5"
+        return "header"
+      when "p"
+        return "paragraph"
+      else
+      return "plaintext"
+    end
+  end
 
-def parse_plain_sections plaintext
-  plaintext.split("\r\r").flatten.split("\n\n").map{ |s| [plain: s, type: "plain"]}
-end
-
-def parse_html_sections html
-  parsed = Nokogiri::HTML html 
-
-  sections = []
-
-  sections.push [html: parsed.css("h1").first.content , type: "title"]
-
-  sections.concat parsed.css("h2, h3, h4, h5").map{ |c| [html: c.content, type: "header"]}
-
-  sections.concat parsed.css("p").map{ |c| [html: c.content, type: "paragraph"]}
-
-  sections
 end
