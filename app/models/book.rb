@@ -29,14 +29,15 @@ class Book < ApplicationRecord
     else
       book = Book.fetch_book(id)
       checked_out = Book.create(title: book[:title], author: book[:author], gutenberg_id: id)
-
-      book[:sections].each do |sect|
-        sect = Section.create(html: sect[:html], 
-                              plain: sect[:plain], 
-                              section_type: sect[:section_type], 
-                              section_number: sect[:section_number])
-        checked_out.sections.push sect
+      batch =  book[:sections].map do |sect|
+        Section.new(html: sect[:html], 
+                    plain: sect[:plain], 
+                    section_type: sect[:section_type], 
+                    section_number: sect[:section_number], 
+                    book_id: checked_out.id)
       end
+
+      Section.import batch
 
       return {book: checked_out, sections: checked_out.sections}
     end
