@@ -2,10 +2,11 @@ class Book < ApplicationRecord
   has_many :annotations
   has_many :sections
 
-  #All steps in preparing book text before serving to the front end
+  def serialized 
+    BookSerializer.new(self).serialized
+  end
 
-  # Book.fetch_book
-  # Fetches book from Gutenberg site
+
   def self.fetch_book(id)
     req = RestClient.get("http://gutendex.com/books/#{id}")
     result = JSON(req)
@@ -20,13 +21,9 @@ class Book < ApplicationRecord
     {title: result["title"], author: author, sections: sections}
   end
 
-  # Book.checkout
-  # Checks if book is in the database before fetching from database
   def self.checkout(id)
     book = Book.find_by(gutenberg_id: id)
-    if (book)
-      return {book: book, sections: book.sections}
-    else
+    if (!book)
       book = Book.fetch_book(id)
       checked_out = Book.create(title: book[:title], author: book[:author], gutenberg_id: id)
       batch =  book[:sections].map do |sect|
@@ -36,19 +33,18 @@ class Book < ApplicationRecord
                     section_number: sect[:section_number], 
                     book_id: checked_out.id)
       end
-
       Section.import batch
-
-      return {book: checked_out, sections: checked_out.sections}
+      book = checked_out
     end
+
+    return {book: book.serialized}
   end
 
-  # Book.search_api
-  # Returns titles, authors, and ids based on a loose user search
   def self.search_api(query)
     req = RestClient.get("http://gutendex.com/books?search=#{query}")
     search = JSON req
   end
+
 
   def self.get_formats formats 
 
@@ -117,7 +113,6 @@ class Book < ApplicationRecord
 
     sections
   end
-
 
   def self.get_section_type node 
 
