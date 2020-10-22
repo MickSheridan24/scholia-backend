@@ -1,8 +1,12 @@
 class Section < ApplicationRecord
-    belongs_to :book
-    has_many :annotations
+  belongs_to :book
+  has_many :annotations
 
-    def serialized 
-        SectionSerializer.new(self).serialized
-    end
+  def serialized
+    return SectionSerializer.new(self).serialized
+  end
+
+  def serializer
+    return SectionSerializer.new(self)
+  end
 end

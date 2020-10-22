@@ -1,10 +1,5 @@
-require "serializer"
-
 class SectionSerializer < Serializer
-  extend Serializer::Attributes
-  include Serializer::Model
- 
-  
-  attributes :id, :html, :plain, :section_type, :section_number
-  has_many :annotations, true
+  def serialized
+    serialize_with_attributes(:id, :html, :plain, :section_type, :section_number)
+  end
 end
