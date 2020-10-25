@@ -38,7 +38,7 @@ class Book < ApplicationRecord
     return BookSerializer.new(book).serialized_with :sections do |sections|
       Serializer.serialize_many_with sections, :annotations do |annotations|
         Serializer.serialize_many annotations
-      end
+      end.sort { |a, b| a[:section_number] <=> b[:section_number]}
     end
   end
 
