@@ -80,6 +80,6 @@ test:
 #
 production:
   <<: *default
-  database: scholia-backend_production
-  username: scholia-backend
-  password: <%= ENV['SCHOLIA-BACKEND_DATABASE_PASSWORD'] %>
+  database: scholia_production
+  username: sheridan
+  password: 8*8
